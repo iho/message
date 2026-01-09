@@ -40,7 +40,7 @@ struct PhotoSelectorView: View {
                 Task {
                     if case .success(let urls) = result {
                         let datas = urls.compactMap { try? Data(contentsOf: $0) }
-                        await viewModel.addImages(from: datas)
+                        viewModel.addImages(from: datas)
                     }
                 }
             }
