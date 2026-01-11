@@ -1,17 +1,33 @@
 name: message-ci
 options:
-  bundleIdPrefix: com.synrc
+  bundleIdPrefix: com.ihor
 targets:
   Message:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
+    destinations:
+      - iOS
+      - macOS
     sources:
       - path: .
         excludes:
           - project.yml
           - README.md
           - .gitignore
+          - messageTests
+          - messageUITests
+          - "**/Info.plist"
+    info:
+      path: message/Info.plist
+      properties:
+        NSLocalNetworkUsageDescription: "We use the local network to find and chat with nearby contacts on the same WiFi."
+        NSBonjourServices:
+          - "_hubchat._tcp"
+          - "_hubchat._udp"
+        NSBluetoothAlwaysUsageDescription: "We use Bluetooth to find and connect with nearby devices when WiFi is not available."
+        NSBluetoothPeripheralUsageDescription: "We use Bluetooth to find and connect with nearby devices when WiFi is not available."
+        UIRequiresFullScreen: YES
     settings:
       GENERATE_INFOPLIST_FILE: YES
       MARKETING_VERSION: "1.0"
@@ -19,5 +35,25 @@ targets:
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       ENABLE_PREVIEWS: YES
       SWIFT_VERSION: 5.9
+      ENABLE_APP_SANDBOX: NO
+      ENABLE_HARDENED_RUNTIME: NO
     dependencies:
       - sdk: CoreData.framework
+  MessageTests:
+    type: bundle.unit-test
+    platform: iOS
+    destinations:
+      - iOS
+      - macOS
+    sources: [messageTests]
+    dependencies:
+      - target: Message
+  MessageUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    destinations:
+      - iOS
+      - macOS
+    sources: [messageUITests]
+    dependencies:
+      - target: Message

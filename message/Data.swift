@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct Participant: Identifiable, Equatable, Hashable {
     let id: String = UUID().uuidString
@@ -13,6 +14,10 @@ struct Participant: Identifiable, Equatable, Hashable {
             familyName: self.lastName,
             nickname: self.username
         )
+    }
+    
+    var displayName: String {
+        return firstName.isEmpty ? username : firstName
     }
 }
 
@@ -34,7 +39,20 @@ let sampleParticipantAlex = Participant(
     username: "username_for_Alex",
     profileImageLink: nil
 )
-let sampleLoggedInUser = sampleParticipantJohn
+class CurrentUser: ObservableObject {
+    static let shared = CurrentUser()
+    @Published var firstName: String = UserDefaults.standard.string(forKey: "user_first_name") ?? "Me"
+    @Published var lastName: String = UserDefaults.standard.string(forKey: "user_last_name") ?? ""
+    @Published var username: String = UserDefaults.standard.string(forKey: "chat_display_name") ?? "Me"
+    
+    var participant: Participant {
+        Participant(firstName: firstName, lastName: lastName, username: username, profileImageLink: nil)
+    }
+}
+
+var sampleLoggedInUser: Participant {
+    CurrentUser.shared.participant
+}
 let sampleMessageHelloWorldJohn = Message(text: "Hello World", createdAt: .now, author: sampleParticipantJohn)
 let sampleMessageHelloWorldJane = Message(text: "Hello World", createdAt: .now, author: sampleParticipantJane)
 let sampleConversation = Conversation(

@@ -5,29 +5,33 @@ import CoreData
 
 @main
 struct MessageApp: App {
-    let persistenceController = PersistenceController.shared
+    @StateObject var chatService = ChatService()
     @State var selectedConversation: Conversation?
     
+    @AppStorage("chat_display_name") var chatDisplayName: String = ""
+    
     var body: some Scene {
-            WindowGroup {
-                // to learn more checkout https://medium.com/@jpmtech/swiftui-navigationsplitview-30ce87b5de03
+        WindowGroup {
+            if chatDisplayName.isEmpty {
+                StartView {
+                    // Refresh view state or rely on AppStorage to trigger update
+                }
+            } else {
                 NavigationSplitView {
                     ConversationListView(
-                        conversations: [
-                            sampleConversation,
-                            sampleLongConversation,
-                            sampleGroupConversation
-                        ],
                         selectedConversation: $selectedConversation
                     )
+                    .environmentObject(chatService)
                 } detail: {
-                    if let selectedConversation {
-                        ChatThreadView(conversation: selectedConversation)
+                    if let conversation = selectedConversation {
+                        ChatThreadView(conversation: conversation)
+                            .environmentObject(chatService)
                     } else {
-                        ContentUnavailableView("Select a conversation", systemImage: "exclamationmark.bubble")
+                        ContentUnavailableView("Select a Conversation", systemImage: "bubble.left.and.bubble.right")
                     }
                 }
             }
         }
+    }
     
 }
